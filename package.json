@@ -1,0 +1,32 @@
+{
+  "name": "n8n-nodes-polycracker",
+  "version": "1.0.0",
+  "description": "Premium AI orchestration nodes for n8n",
+  "keywords": ["n8n-community-node-package"],
+  "license": "MIT",
+  "main": "index.js",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc && node scripts/copy-assets.js",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/ParrotApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/ParrotIntegration/ParrotIntegration.node.js",
+      "dist/nodes/ParrotSmart/ParrotSmart.node.js",
+      "dist/nodes/ParrotGate/ParrotGate.node.js"
+    ]
+  },
+  "dependencies": {
+    "n8n-workflow": "latest",
+    "n8n-core": "latest"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

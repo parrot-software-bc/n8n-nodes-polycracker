@@ -1,0 +1,15 @@
+{
+	"node": "n8n-nodes-parrot-gate.parrotSmart",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Miscellaneous"],
+	"credentials": [
+		{
+			"name": "parrotApi",
+			"required": true
+		}
+	],
+	"resources": {
+		"primaryDocumentation": []
+	}
+}

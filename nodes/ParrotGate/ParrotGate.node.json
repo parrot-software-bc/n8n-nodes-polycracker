@@ -1,0 +1,5 @@
+{
+  "node": "n8n-nodes-base.parrotGate",
+  "nodeVersion": "1.0",
+  "codex": { "categories": ["Utility"] }
+}
