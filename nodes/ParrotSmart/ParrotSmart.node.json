@@ -1,5 +1,5 @@
 {
-	"node": "n8n-nodes-parrot-gate.parrotSmart",
+	"node": "n8n-nodes-polycracker.parrotSmart",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Miscellaneous"],

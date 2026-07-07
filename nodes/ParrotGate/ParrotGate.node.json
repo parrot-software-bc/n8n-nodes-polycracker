@@ -1,5 +1,15 @@
 {
-  "node": "n8n-nodes-base.parrotGate",
-  "nodeVersion": "1.0",
-  "codex": { "categories": ["Utility"] }
+	"node": "n8n-nodes-polycracker.parrotGate",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Utility"],
+	"credentials": [
+		{
+			"name": "parrotApi",
+			"required": true
+		}
+	],
+	"resources": {
+		"primaryDocumentation": []
+	}
 }
