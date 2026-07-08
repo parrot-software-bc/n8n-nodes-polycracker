@@ -21,7 +21,7 @@ export class ParrotGate implements INodeType {
         name: 'parrotGate',
         icon: 'file:parrot-green.svg',
         group: ['transform'],
-        version: 1,
+        version: 2,
         description: 'Privacy-first gateway for Polycracker. Provides schema healing, data scrubbing, and secure API access.',
         defaults: {
             name: 'Parrot Gate',
@@ -37,7 +37,7 @@ export class ParrotGate implements INodeType {
         properties: [
             {
                 displayName:
-                    'First time? <a href="https://portal.polycracker.dev/dashboard?action=register" target="_blank" rel="noopener noreferrer" style="color:#2563eb;font-weight:700;text-decoration:underline">Register for Parrot Gate</a> to get your User ID and API Key.',
+                    'First time? <a href="https://portal.polycracker.dev/dashboard?action=register" target="_blank" rel="noopener noreferrer" style="color:#2563eb;font-weight:700;text-decoration:underline">Register for Parrot Gate</a> to get your User ID and API Key, then add them to your <strong>Parrot API</strong> credential.',
                 name: 'registerNotice',
                 type: 'notice',
                 typeOptions: {
@@ -47,18 +47,10 @@ export class ParrotGate implements INodeType {
             },
             {
                 displayName:
-                    '📖 **Parrot Gate Quick Start:**\n1. Select your **Action** (The AI&apos;s job).\n2. Set a **Privacy Guardrail** (Target Schema) if required.\n3. Map your **Payload** (or leave blank to auto-process incoming data).',
+                    '📖 **Parrot Gate Quick Start:**\n1. Configure your **Parrot API** credential (Base URL, API Key, User ID).\n2. Select your **Action** (The AI&apos;s job).\n3. Set a **Privacy Guardrail** (Target Schema) if required.\n4. Map your **Payload** (or leave blank to auto-process incoming data).',
                 name: 'quickStartNotice',
                 type: 'notice',
                 default: '',
-            },
-            {
-                displayName: 'User ID',
-                name: 'user_id',
-                type: 'string',
-                default: '',
-                required: true,
-                description: 'Your Parrot Gate user id (required when you run this node)',
             },
             {
                 displayName: 'Action',
@@ -141,13 +133,10 @@ export class ParrotGate implements INodeType {
             );
         }
 
+        const userId = String(credentials.userId ?? '').trim() || 'n8n_user';
+
         for (let i = 0; i < items.length; i++) {
             try {
-                const row = items[i].json as IDataObject;
-                const userId =
-                    (typeof row.user_id === 'string' && row.user_id) ||
-                    (typeof row.userId === 'string' && row.userId) ||
-                    (this.getNodeParameter('user_id', i) as string);
                 const action = this.getNodeParameter('action', i) as string;
                 const sentryPreset = this.getNodeParameter('target_schema', i, 'manual') as string;
                 const customSchema = this.getNodeParameter('custom_schema', i, '') as string;

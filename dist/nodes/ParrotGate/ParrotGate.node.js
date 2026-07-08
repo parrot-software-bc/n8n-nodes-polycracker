@@ -16,7 +16,7 @@ class ParrotGate {
             name: 'parrotGate',
             icon: 'file:parrot-green.svg',
             group: ['transform'],
-            version: 1,
+            version: 2,
             description: 'Privacy-first gateway for Polycracker. Provides schema healing, data scrubbing, and secure API access.',
             defaults: {
                 name: 'Parrot Gate',
@@ -31,7 +31,7 @@ class ParrotGate {
             ],
             properties: [
                 {
-                    displayName: 'First time? <a href="https://portal.polycracker.dev/dashboard?action=register" target="_blank" rel="noopener noreferrer" style="color:#2563eb;font-weight:700;text-decoration:underline">Register for Parrot Gate</a> to get your User ID and API Key.',
+                    displayName: 'First time? <a href="https://portal.polycracker.dev/dashboard?action=register" target="_blank" rel="noopener noreferrer" style="color:#2563eb;font-weight:700;text-decoration:underline">Register for Parrot Gate</a> to get your User ID and API Key, then add them to your <strong>Parrot API</strong> credential.',
                     name: 'registerNotice',
                     type: 'notice',
                     typeOptions: {
@@ -40,18 +40,10 @@ class ParrotGate {
                     default: '',
                 },
                 {
-                    displayName: '📖 **Parrot Gate Quick Start:**\n1. Select your **Action** (The AI&apos;s job).\n2. Set a **Privacy Guardrail** (Target Schema) if required.\n3. Map your **Payload** (or leave blank to auto-process incoming data).',
+                    displayName: '📖 **Parrot Gate Quick Start:**\n1. Configure your **Parrot API** credential (Base URL, API Key, User ID).\n2. Select your **Action** (The AI&apos;s job).\n3. Set a **Privacy Guardrail** (Target Schema) if required.\n4. Map your **Payload** (or leave blank to auto-process incoming data).',
                     name: 'quickStartNotice',
                     type: 'notice',
                     default: '',
-                },
-                {
-                    displayName: 'User ID',
-                    name: 'user_id',
-                    type: 'string',
-                    default: '',
-                    required: true,
-                    description: 'Your Parrot Gate user id (required when you run this node)',
                 },
                 {
                     displayName: 'Action',
@@ -122,7 +114,7 @@ class ParrotGate {
         };
     }
     async execute() {
-        var _a;
+        var _a, _b;
         const items = this.getInputData();
         const returnData = [];
         const credentials = await this.getCredentials('parrotApi');
@@ -131,12 +123,9 @@ class ParrotGate {
         if (!apiKey) {
             throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'A valid Parrot API Key is required. Please add it to your node credentials.');
         }
+        const userId = String((_b = credentials.userId) !== null && _b !== void 0 ? _b : '').trim() || 'n8n_user';
         for (let i = 0; i < items.length; i++) {
             try {
-                const row = items[i].json;
-                const userId = (typeof row.user_id === 'string' && row.user_id) ||
-                    (typeof row.userId === 'string' && row.userId) ||
-                    this.getNodeParameter('user_id', i);
                 const action = this.getNodeParameter('action', i);
                 const sentryPreset = this.getNodeParameter('target_schema', i, 'manual');
                 const customSchema = this.getNodeParameter('custom_schema', i, '');
