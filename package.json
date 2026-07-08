@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-polycracker",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Premium AI orchestration nodes for n8n",
   "repository": {
     "type": "git",

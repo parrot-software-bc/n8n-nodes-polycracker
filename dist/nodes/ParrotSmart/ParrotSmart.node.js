@@ -91,6 +91,16 @@ function extractSmartPlusIntegrityMessage(body) {
     }
     return undefined;
 }
+function extractHttpStatusCode(error) {
+    const errorRecord = error !== null && typeof error === 'object' ? error : undefined;
+    if (typeof (errorRecord === null || errorRecord === void 0 ? void 0 : errorRecord.statusCode) === 'number') {
+        return errorRecord.statusCode;
+    }
+    if (typeof (errorRecord === null || errorRecord === void 0 ? void 0 : errorRecord.httpCode) === 'number') {
+        return errorRecord.httpCode;
+    }
+    return undefined;
+}
 class ParrotSmart {
     constructor() {
         this.description = {
@@ -98,7 +108,7 @@ class ParrotSmart {
             name: 'parrotSmart',
             icon: 'file:parrot.svg',
             group: ['transform'],
-            version: 2,
+            version: 3,
             description: 'Universal AI sequence engine. Choose Guided or Chameleon tiers to eliminate workflow spaghetti and manage session-bound AI data with Polycracker.',
             defaults: {
                 name: 'Parrot Smart Node',
@@ -113,7 +123,7 @@ class ParrotSmart {
             ],
             properties: [
                 {
-                    displayName: 'Tier',
+                    displayName: 'Execution Path',
                     name: 'tier',
                     type: 'options',
                     noDataExpression: true,
@@ -126,12 +136,32 @@ class ParrotSmart {
                 },
                 {
                     displayName: 'Reasoning Engine',
-                    name: 'model',
+                    name: 'guided_model',
+                    type: 'options',
+                    default: 'gpt-4o-mini',
+                    displayOptions: {
+                        show: {
+                            tier: ['guided'],
+                        },
+                    },
+                    options: [
+                        { name: 'GPT-4o-mini (Included)', value: 'gpt-4o-mini' },
+                        { name: 'Claude 3.5 Haiku (Apex/Enterprise Only)', value: 'haiku' },
+                    ],
+                },
+                {
+                    displayName: 'Reasoning Engine',
+                    name: 'chameleon_model',
                     type: 'options',
                     default: 'gpt-4o',
+                    displayOptions: {
+                        show: {
+                            tier: ['chameleon'],
+                        },
+                    },
                     options: [
                         { name: 'GPT-4o (Standard)', value: 'gpt-4o' },
-                        { name: 'Claude 3.5 Sonnet (Apex/Enterprise)', value: 'claude-3-5-sonnet' },
+                        { name: 'Claude 3.5 Sonnet (Apex/Enterprise Only)', value: 'claude-3-5-sonnet' },
                     ],
                 },
                 {
@@ -237,7 +267,9 @@ class ParrotSmart {
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             const tier = this.getNodeParameter('tier', i);
-            const model = this.getNodeParameter('model', i, 'gpt-4o');
+            const model = tier === TIER_GUIDED
+                ? this.getNodeParameter('guided_model', i, 'gpt-4o-mini')
+                : this.getNodeParameter('chameleon_model', i, 'gpt-4o');
             const useVault = this.getNodeParameter('useVault', i, false);
             const productionVault = String(this.getNodeParameter('productionVault', i, 'primary')).trim();
             let taskValue = '';
@@ -289,6 +321,16 @@ class ParrotSmart {
                 });
             }
             catch (error) {
+                const statusCode = extractHttpStatusCode(error);
+                if (statusCode === 403) {
+                    throw new n8n_workflow_1.NodeApiError(this.getNode(), asJsonObject(error !== null && typeof error === 'object'
+                        ? error
+                        : { code: 'TIER_UPGRADE_REQUIRED' }), {
+                        message: 'Tier Upgrade Required',
+                        description: 'This model is reserved for Apex and Enterprise tiers.',
+                        itemIndex: i,
+                    });
+                }
                 const message = error instanceof Error ? error.message : String(error);
                 throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Highway smart-hit request failed: ${message}`, {
                     itemIndex: i,

@@ -111,13 +111,25 @@ function extractSmartPlusIntegrityMessage(body: unknown): string | undefined {
 	return undefined;
 }
 
+function extractHttpStatusCode(error: unknown): number | undefined {
+	const errorRecord =
+		error !== null && typeof error === 'object' ? (error as Record<string, unknown>) : undefined;
+	if (typeof errorRecord?.statusCode === 'number') {
+		return errorRecord.statusCode;
+	}
+	if (typeof errorRecord?.httpCode === 'number') {
+		return errorRecord.httpCode;
+	}
+	return undefined;
+}
+
 export class ParrotSmart implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Parrot Smart',
 		name: 'parrotSmart',
 		icon: 'file:parrot.svg',
 		group: ['transform'],
-		version: 2,
+		version: 3,
 		description:
 			'Universal AI sequence engine. Choose Guided or Chameleon tiers to eliminate workflow spaghetti and manage session-bound AI data with Polycracker.',
 		defaults: {
@@ -133,7 +145,7 @@ export class ParrotSmart implements INodeType {
 		],
 		properties: [
 			{
-				displayName: 'Tier',
+				displayName: 'Execution Path',
 				name: 'tier',
 				type: 'options',
 				noDataExpression: true,
@@ -146,12 +158,32 @@ export class ParrotSmart implements INodeType {
 			},
 			{
 				displayName: 'Reasoning Engine',
-				name: 'model',
+				name: 'guided_model',
+				type: 'options',
+				default: 'gpt-4o-mini',
+				displayOptions: {
+					show: {
+						tier: ['guided'],
+					},
+				},
+				options: [
+					{ name: 'GPT-4o-mini (Included)', value: 'gpt-4o-mini' },
+					{ name: 'Claude 3.5 Haiku (Apex/Enterprise Only)', value: 'haiku' },
+				],
+			},
+			{
+				displayName: 'Reasoning Engine',
+				name: 'chameleon_model',
 				type: 'options',
 				default: 'gpt-4o',
+				displayOptions: {
+					show: {
+						tier: ['chameleon'],
+					},
+				},
 				options: [
 					{ name: 'GPT-4o (Standard)', value: 'gpt-4o' },
-					{ name: 'Claude 3.5 Sonnet (Apex/Enterprise)', value: 'claude-3-5-sonnet' },
+					{ name: 'Claude 3.5 Sonnet (Apex/Enterprise Only)', value: 'claude-3-5-sonnet' },
 				],
 			},
 			{
@@ -262,7 +294,10 @@ export class ParrotSmart implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			const item = items[i];
 			const tier = this.getNodeParameter('tier', i) as TierParam;
-			const model = this.getNodeParameter('model', i, 'gpt-4o') as string;
+			const model =
+				tier === TIER_GUIDED
+					? (this.getNodeParameter('guided_model', i, 'gpt-4o-mini') as string)
+					: (this.getNodeParameter('chameleon_model', i, 'gpt-4o') as string);
 			const useVault = this.getNodeParameter('useVault', i, false) as boolean;
 			const productionVault = String(this.getNodeParameter('productionVault', i, 'primary')).trim();
 
@@ -325,6 +360,24 @@ export class ParrotSmart implements INodeType {
 					body: JSON.stringify(smartHitBody),
 				});
 			} catch (error) {
+				const statusCode = extractHttpStatusCode(error);
+
+				if (statusCode === 403) {
+					throw new NodeApiError(
+						this.getNode(),
+						asJsonObject(
+							error !== null && typeof error === 'object'
+								? (error as Record<string, unknown>)
+								: { code: 'TIER_UPGRADE_REQUIRED' },
+						),
+						{
+							message: 'Tier Upgrade Required',
+							description: 'This model is reserved for Apex and Enterprise tiers.',
+							itemIndex: i,
+						},
+					);
+				}
+
 				const message = error instanceof Error ? error.message : String(error);
 				throw new NodeOperationError(this.getNode(), `Highway smart-hit request failed: ${message}`, {
 					itemIndex: i,
