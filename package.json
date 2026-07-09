@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-polycracker",
-  "version": "1.0.8",
+  "version": "1.0.10",
   "description": "Premium AI orchestration nodes for n8n",
   "repository": {
     "type": "git",
@@ -26,11 +26,9 @@
       "dist/nodes/ParrotGate/ParrotGate.node.js"
     ]
   },
-  "dependencies": {
-    "n8n-workflow": "latest",
-    "n8n-core": "latest"
-  },
   "devDependencies": {
+    "n8n-core": "latest",
+    "n8n-workflow": "latest",
     "typescript": "^5.0.0"
   }
 }
