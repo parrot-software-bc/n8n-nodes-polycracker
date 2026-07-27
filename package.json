@@ -1,7 +1,8 @@
 {
   "name": "n8n-nodes-polycracker",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Premium AI orchestration nodes for n8n",
+  "author": "Parrot Integrated Software <parrotsoftwarebc@gmail.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/parrot-software-bc/n8n-nodes-polycracker.git"
