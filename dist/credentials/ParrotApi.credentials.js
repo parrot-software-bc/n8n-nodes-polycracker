@@ -5,7 +5,11 @@ class ParrotApi {
     constructor() {
         this.name = 'parrotApi';
         this.displayName = 'Parrot API';
-        this.documentationUrl = '';
+        this.documentationUrl = 'https://www.polycracker.dev';
+        this.icon = {
+            light: 'file:parrot.svg',
+            dark: 'file:parrot.dark.svg',
+        };
         this.properties = [
             {
                 displayName: 'API Base URL',
@@ -32,6 +36,21 @@ class ParrotApi {
                 required: true,
             },
         ];
+        this.authenticate = {
+            type: 'generic',
+            properties: {
+                headers: {
+                    'X-API-Key': '={{$credentials.apiKey}}',
+                },
+            },
+        };
+        this.test = {
+            request: {
+                baseURL: '={{$credentials.baseUrl}}',
+                url: '/',
+                method: 'GET',
+            },
+        };
     }
 }
 exports.ParrotApi = ParrotApi;

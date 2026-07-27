@@ -1,18 +1,20 @@
 const fs = require('fs');
 const path = require('path');
 
-function copySvgs(dir) {
-	for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-		const full = path.join(dir, entry.name);
+function copySvgs(sourceRoot, destRoot) {
+	if (!fs.existsSync(sourceRoot)) {
+		return;
+	}
+	for (const entry of fs.readdirSync(sourceRoot, { withFileTypes: true })) {
+		const full = path.join(sourceRoot, entry.name);
 		if (entry.isDirectory()) {
-			copySvgs(full);
+			copySvgs(full, path.join(destRoot, entry.name));
 		} else if (entry.name.endsWith('.svg')) {
-			const rel = path.relative('nodes', full);
-			const dest = path.join('dist', 'nodes', rel);
-			fs.mkdirSync(path.dirname(dest), { recursive: true });
-			fs.copyFileSync(full, dest);
+			fs.mkdirSync(destRoot, { recursive: true });
+			fs.copyFileSync(full, path.join(destRoot, entry.name));
 		}
 	}
 }
 
-copySvgs('nodes');
+copySvgs('nodes', path.join('dist', 'nodes'));
+copySvgs('credentials', path.join('dist', 'credentials'));

@@ -46,13 +46,18 @@ class ParrotIntegration {
         this.description = {
             displayName: 'Parrot Integration',
             name: 'parrotIntegration',
-            icon: 'file:parrot.svg',
+            icon: {
+                light: 'file:parrot.svg',
+                dark: 'file:parrot.dark.svg',
+            },
             group: ['transform'],
             version: 2,
-            description: 'High-performance session commander for Polycracker. Manages tier-aware routing and authentication for seamless API integration.',
+            subtitle: '={{$parameter["mission_label"]}}',
+            description: 'High-performance session commander for Polycracker. Manages tier-aware routing and authentication for seamless API integration',
             defaults: { name: 'Parrot Integration' },
-            inputs: ['main'],
-            outputs: ['main'],
+            inputs: [n8n_workflow_1.NodeConnectionTypes.Main],
+            outputs: [n8n_workflow_1.NodeConnectionTypes.Main],
+            usableAsTool: true,
             credentials: [
                 {
                     name: 'parrotApi',
@@ -77,7 +82,7 @@ class ParrotIntegration {
                     typeOptions: {
                         rows: 6,
                     },
-                    description: 'Please insert the context or parameters of what you would like to see happen.',
+                    description: 'Please insert the context or parameters of what you would like to see happen',
                 },
             ],
         };
@@ -132,11 +137,10 @@ class ParrotIntegration {
             const tierParam = 'guided';
             let rawResponse;
             try {
-                rawResponse = await this.helpers.request({
+                rawResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'parrotApi', {
                     method: 'POST',
                     url: highwayUrl,
                     headers: {
-                        'X-API-Key': apiKey,
                         'Content-Type': 'application/json',
                         Accept: 'application/json',
                     },
@@ -231,9 +235,6 @@ class ParrotIntegration {
             }
         }
         catch (error) {
-            if (error instanceof n8n_workflow_1.NodeApiError) {
-                throw error;
-            }
             const errObj = error !== null && typeof error === 'object'
                 ? asJsonObject(error)
                 : asJsonObject({ message: String(error) });

@@ -2,6 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParrotGate = void 0;
 const n8n_workflow_1 = require("n8n-workflow");
+function asJsonObject(payload) {
+    return payload;
+}
 function normalizeApiBaseUrl(raw) {
     const base = String(raw !== null && raw !== void 0 ? raw : '').trim().replace(/\/$/, '');
     if (!base) {
@@ -14,15 +17,20 @@ class ParrotGate {
         this.description = {
             displayName: 'Parrot Gate',
             name: 'parrotGate',
-            icon: 'file:parrot-green.svg',
+            icon: {
+                light: 'file:parrot-green.svg',
+                dark: 'file:parrot-green.dark.svg',
+            },
             group: ['transform'],
             version: 2,
-            description: 'Privacy-first gateway for Polycracker. Provides schema healing, data scrubbing, and secure API access.',
+            subtitle: '={{$parameter["action"]}}',
+            description: 'Privacy-first gateway for Polycracker. Provides schema healing, data scrubbing, and secure API access',
             defaults: {
                 name: 'Parrot Gate',
             },
-            inputs: ['main'],
-            outputs: ['main'],
+            inputs: [n8n_workflow_1.NodeConnectionTypes.Main],
+            outputs: [n8n_workflow_1.NodeConnectionTypes.Main],
+            usableAsTool: true,
             credentials: [
                 {
                     name: 'parrotApi',
@@ -40,7 +48,7 @@ class ParrotGate {
                     default: '',
                 },
                 {
-                    displayName: '📖 **Parrot Gate Quick Start:**\n1. Configure your **Parrot API** credential (Base URL, API Key, User ID).\n2. Select your **Action** (The AI&apos;s job).\n3. Set a **Privacy Guardrail** (Target Schema) if required.\n4. Map your **Payload** (or leave blank to auto-process incoming data).',
+                    displayName: '**Parrot Gate Quick Start:**\n1. Configure your **Parrot API** credential (Base URL, API Key, User ID).\n2. Select your **Action** (The AI&apos;s job).\n3. Set a **Privacy Guardrail** (Target Schema) if required.\n4. Map your **Payload** (or leave blank to auto-process incoming data).',
                     name: 'quickStartNotice',
                     type: 'notice',
                     default: '',
@@ -114,11 +122,17 @@ class ParrotGate {
         };
     }
     async execute() {
-        var _a, _b;
+        var _a, _b, _c;
         const items = this.getInputData();
         const returnData = [];
         const credentials = await this.getCredentials('parrotApi');
-        const baseUrl = normalizeApiBaseUrl(credentials.baseUrl);
+        let baseUrl;
+        try {
+            baseUrl = normalizeApiBaseUrl(credentials.baseUrl);
+        }
+        catch (error) {
+            throw new n8n_workflow_1.NodeOperationError(this.getNode(), error instanceof Error ? error.message : String(error));
+        }
         const apiKey = String((_a = credentials.apiKey) !== null && _a !== void 0 ? _a : '').trim();
         if (!apiKey) {
             throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'A valid Parrot API Key is required. Please add it to your node credentials.');
@@ -142,7 +156,7 @@ class ParrotGate {
                     try {
                         finalSchema = JSON.parse(customSchema);
                     }
-                    catch (e) {
+                    catch {
                         finalSchema = customSchema;
                     }
                 }
@@ -156,37 +170,36 @@ class ParrotGate {
                 const options = isAudit
                     ? {
                         method: 'GET',
-                        uri: finalUrl,
-                        headers: {
-                            'X-API-Key': apiKey,
-                        },
+                        url: finalUrl,
                         json: true,
                     }
                     : {
                         method: 'POST',
-                        uri: finalUrl,
+                        url: finalUrl,
                         body,
-                        headers: {
-                            'X-API-Key': apiKey,
-                        },
                         json: true,
                     };
-                let responseData = await this.helpers.request(options);
+                let responseData = (await this.helpers.httpRequestWithAuthentication.call(this, 'parrotApi', options));
                 if (!isAudit && (responseData === null || responseData === void 0 ? void 0 : responseData.status) === 'success' && (responseData === null || responseData === void 0 ? void 0 : responseData.data) !== undefined) {
                     responseData = responseData.data;
                 }
                 if (responseData.status === 'error') {
-                    throw new Error(`Parrot Gate Denied: ${responseData.message}`);
+                    throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Parrot Gate Denied: ${String((_c = responseData.message) !== null && _c !== void 0 ? _c : 'Unknown error')}`, { itemIndex: i });
                 }
-                returnData.push({ json: responseData });
+                returnData.push({ json: responseData, pairedItem: { item: i } });
             }
             catch (error) {
                 if (this.continueOnFail()) {
                     const message = error instanceof Error ? error.message : String(error);
-                    returnData.push({ json: { error: message } });
+                    returnData.push({ json: { error: message }, pairedItem: { item: i } });
                     continue;
                 }
-                throw error;
+                throw new n8n_workflow_1.NodeApiError(this.getNode(), asJsonObject(error !== null && typeof error === 'object'
+                    ? error
+                    : { message: String(error) }), {
+                    message: error instanceof Error ? error.message : String(error),
+                    itemIndex: i,
+                });
             }
         }
         return [returnData];

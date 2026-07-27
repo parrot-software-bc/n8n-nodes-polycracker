@@ -1,213 +1,246 @@
-import {
-    IExecuteFunctions,
-    INodeExecutionData,
-    INodeType,
-    INodeTypeDescription,
-    IDataObject,
+import type {
+	IDataObject,
+	IExecuteFunctions,
+	INodeExecutionData,
+	INodeType,
+	INodeTypeDescription,
+	JsonObject,
 } from 'n8n-workflow';
-import { NodeOperationError } from 'n8n-workflow';
+import { NodeApiError, NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
+
+function asJsonObject(payload: IDataObject | Record<string, unknown>): JsonObject {
+	return payload as unknown as JsonObject;
+}
 
 function normalizeApiBaseUrl(raw: unknown): string {
-    const base = String(raw ?? '').trim().replace(/\/$/, '');
-    if (!base) {
-        throw new Error('Parrot API credentials must include API Base URL.');
-    }
-    return base;
+	const base = String(raw ?? '').trim().replace(/\/$/, '');
+	if (!base) {
+		throw new Error('Parrot API credentials must include API Base URL.');
+	}
+	return base;
 }
 
 export class ParrotGate implements INodeType {
-    description: INodeTypeDescription = {
-        displayName: 'Parrot Gate',
-        name: 'parrotGate',
-        icon: 'file:parrot-green.svg',
-        group: ['transform'],
-        version: 2,
-        description: 'Privacy-first gateway for Polycracker. Provides schema healing, data scrubbing, and secure API access.',
-        defaults: {
-            name: 'Parrot Gate',
-        },
-        inputs: ['main'],
-        outputs: ['main'],
-        credentials: [
-            {
-                name: 'parrotApi',
-                required: true,
-            },
-        ],
-        properties: [
-            {
-                displayName:
-                    'First time? <a href="https://portal.polycracker.dev/dashboard?action=register" target="_blank" rel="noopener noreferrer" style="color:#2563eb;font-weight:700;text-decoration:underline">Register for Parrot Gate</a> to get your User ID and API Key, then add them to your <strong>Parrot API</strong> credential.',
-                name: 'registerNotice',
-                type: 'notice',
-                typeOptions: {
-                    clickable: true,
-                },
-                default: '',
-            },
-            {
-                displayName:
-                    '📖 **Parrot Gate Quick Start:**\n1. Configure your **Parrot API** credential (Base URL, API Key, User ID).\n2. Select your **Action** (The AI&apos;s job).\n3. Set a **Privacy Guardrail** (Target Schema) if required.\n4. Map your **Payload** (or leave blank to auto-process incoming data).',
-                name: 'quickStartNotice',
-                type: 'notice',
-                default: '',
-            },
-            {
-                displayName: 'Action',
-                name: 'action',
-                type: 'options',
-                noDataExpression: true,
-                options: [
-                    { name: 'Integrity Master (Heal + Scrub)', value: 'master' },
-                    { name: 'Data Architect (Heal)', value: 'architect' },
-                    { name: 'Custom Alchemist (Advanced)', value: 'alchemist' },
-                    { name: 'Validation Sentry', value: 'sentry' },
-                    { name: 'Privacy Scout (Scrub)', value: 'scout' },
-                    { name: 'Basic Processing (Chirp)', value: 'chirp' },
-                    { name: 'Audit Logs (Quick Look)', value: 'audit' },
-                ],
-                default: 'chirp',
-            },
-            {
-                displayName: 'Payload',
-                name: 'payload',
-                type: 'string',
-                default: '',
-                required: false,
-                displayOptions: {
-                    hide: {
-                        action: ['audit'],
-                    },
-                },
-                description: 'Leave empty to process all incoming data',
-            },
-            {
-                displayName: 'Privacy Guardrail',
-                name: 'target_schema',
-                type: 'options',
-                displayOptions: {
-                    hide: {
-                        action: ['audit'],
-                    },
-                },
-                options: [
-                    { name: 'None (Manual Mode)', value: 'manual' },
-                    { name: 'Lead Protection (Name + Email)', value: 'leads' },
-                    { name: 'Financial Audit (Amount + Vendor)', value: 'invoices' },
-                    { name: 'E-commerce Security (Total + SKU)', value: 'ecommerce' },
-                    { name: 'HR Compliance (Salary + Role)', value: 'hr' },
-                    { name: 'Support Optimization (Priority)', value: 'support' },
-                    { name: 'Enterprise Standard (Strict Validation)', value: 'strict' },
-                ],
-                default: 'manual',
-                description: 'Select a pre-built data integrity profile',
-            },
-            {
-                displayName: 'Custom JSON Schema',
-                name: 'custom_schema',
-                type: 'string',
-                displayOptions: {
-                    show: {
-                        target_schema: ['manual'],
-                    },
-                    hide: {
-                        action: ['audit'],
-                    },
-                },
-                default: '',
-                description: 'Define custom validation parameters in JSON format',
-            },
-        ],
-    };
+	description: INodeTypeDescription = {
+		displayName: 'Parrot Gate',
+		name: 'parrotGate',
+		icon: {
+			light: 'file:parrot-green.svg',
+			dark: 'file:parrot-green.dark.svg',
+		},
+		group: ['transform'],
+		version: 2,
+		subtitle: '={{$parameter["action"]}}',
+		description:
+			'Privacy-first gateway for Polycracker. Provides schema healing, data scrubbing, and secure API access',
+		defaults: {
+			name: 'Parrot Gate',
+		},
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
+		usableAsTool: true,
+		credentials: [
+			{
+				name: 'parrotApi',
+				required: true,
+			},
+		],
+		properties: [
+			{
+				displayName:
+					'First time? <a href="https://portal.polycracker.dev/dashboard?action=register" target="_blank" rel="noopener noreferrer" style="color:#2563eb;font-weight:700;text-decoration:underline">Register for Parrot Gate</a> to get your User ID and API Key, then add them to your <strong>Parrot API</strong> credential.',
+				name: 'registerNotice',
+				type: 'notice',
+				typeOptions: {
+					clickable: true,
+				},
+				default: '',
+			},
+			{
+				displayName:
+					'**Parrot Gate Quick Start:**\n1. Configure your **Parrot API** credential (Base URL, API Key, User ID).\n2. Select your **Action** (The AI&apos;s job).\n3. Set a **Privacy Guardrail** (Target Schema) if required.\n4. Map your **Payload** (or leave blank to auto-process incoming data).',
+				name: 'quickStartNotice',
+				type: 'notice',
+				default: '',
+			},
+			{
+				displayName: 'Action',
+				name: 'action',
+				type: 'options',
+				noDataExpression: true,
+				options: [
+					{ name: 'Integrity Master (Heal + Scrub)', value: 'master' },
+					{ name: 'Data Architect (Heal)', value: 'architect' },
+					{ name: 'Custom Alchemist (Advanced)', value: 'alchemist' },
+					{ name: 'Validation Sentry', value: 'sentry' },
+					{ name: 'Privacy Scout (Scrub)', value: 'scout' },
+					{ name: 'Basic Processing (Chirp)', value: 'chirp' },
+					{ name: 'Audit Logs (Quick Look)', value: 'audit' },
+				],
+				default: 'chirp',
+			},
+			{
+				displayName: 'Payload',
+				name: 'payload',
+				type: 'string',
+				default: '',
+				required: false,
+				displayOptions: {
+					hide: {
+						action: ['audit'],
+					},
+				},
+				description: 'Leave empty to process all incoming data',
+			},
+			{
+				displayName: 'Privacy Guardrail',
+				name: 'target_schema',
+				type: 'options',
+				displayOptions: {
+					hide: {
+						action: ['audit'],
+					},
+				},
+				options: [
+					{ name: 'None (Manual Mode)', value: 'manual' },
+					{ name: 'Lead Protection (Name + Email)', value: 'leads' },
+					{ name: 'Financial Audit (Amount + Vendor)', value: 'invoices' },
+					{ name: 'E-commerce Security (Total + SKU)', value: 'ecommerce' },
+					{ name: 'HR Compliance (Salary + Role)', value: 'hr' },
+					{ name: 'Support Optimization (Priority)', value: 'support' },
+					{ name: 'Enterprise Standard (Strict Validation)', value: 'strict' },
+				],
+				default: 'manual',
+				description: 'Select a pre-built data integrity profile',
+			},
+			{
+				displayName: 'Custom JSON Schema',
+				name: 'custom_schema',
+				type: 'string',
+				displayOptions: {
+					show: {
+						target_schema: ['manual'],
+					},
+					hide: {
+						action: ['audit'],
+					},
+				},
+				default: '',
+				description: 'Define custom validation parameters in JSON format',
+			},
+		],
+	};
 
-    async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-        const items = this.getInputData();
-        const returnData: INodeExecutionData[] = [];
-        const credentials = await this.getCredentials('parrotApi');
-        const baseUrl = normalizeApiBaseUrl(credentials.baseUrl);
-        const apiKey = String(credentials.apiKey ?? '').trim();
-        if (!apiKey) {
-            throw new NodeOperationError(
-                this.getNode(),
-                'A valid Parrot API Key is required. Please add it to your node credentials.',
-            );
-        }
+	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+		const items = this.getInputData();
+		const returnData: INodeExecutionData[] = [];
+		const credentials = await this.getCredentials('parrotApi');
 
-        const userId = String(credentials.userId ?? '').trim() || 'n8n_user';
+		let baseUrl: string;
+		try {
+			baseUrl = normalizeApiBaseUrl(credentials.baseUrl);
+		} catch (error) {
+			throw new NodeOperationError(
+				this.getNode(),
+				error instanceof Error ? error.message : String(error),
+			);
+		}
 
-        for (let i = 0; i < items.length; i++) {
-            try {
-                const action = this.getNodeParameter('action', i) as string;
-                const sentryPreset = this.getNodeParameter('target_schema', i, 'manual') as string;
-                const customSchema = this.getNodeParameter('custom_schema', i, '') as string;
-                let payload = this.getNodeParameter('payload', i, '') as any;
+		const apiKey = String(credentials.apiKey ?? '').trim();
+		if (!apiKey) {
+			throw new NodeOperationError(
+				this.getNode(),
+				'A valid Parrot API Key is required. Please add it to your node credentials.',
+			);
+		}
 
-                const isAudit = action === 'audit';
-                const finalUrl = isAudit
-                    ? `${baseUrl}/parrot-gate/history?user_id=${userId}`
-                    : `${baseUrl}/parrot-gate/use_api`;
+		const userId = String(credentials.userId ?? '').trim() || 'n8n_user';
 
-                if (!payload || payload === '') {
-                    payload = items[i].json;
-                }
+		for (let i = 0; i < items.length; i++) {
+			try {
+				const action = this.getNodeParameter('action', i) as string;
+				const sentryPreset = this.getNodeParameter('target_schema', i, 'manual') as string;
+				const customSchema = this.getNodeParameter('custom_schema', i, '') as string;
+				let payload = this.getNodeParameter('payload', i, '') as unknown;
 
-                let finalSchema: any = sentryPreset;
-                if (sentryPreset === 'manual' && customSchema !== '') {
-                    try {
-                        finalSchema = JSON.parse(customSchema);
-                    } catch (e) {
-                        finalSchema = customSchema;
-                    }
-                }
+				const isAudit = action === 'audit';
+				const finalUrl = isAudit
+					? `${baseUrl}/parrot-gate/history?user_id=${userId}`
+					: `${baseUrl}/parrot-gate/use_api`;
 
-                const body: IDataObject = {
-                    user_id: userId,
-                    api_key: apiKey,
-                    action: action,
-                    payload: payload,
-                    target_schema: finalSchema,
-                };
+				if (!payload || payload === '') {
+					payload = items[i].json;
+				}
 
-                const options = isAudit
-                    ? {
-                            method: 'GET',
-                            uri: finalUrl,
-                            headers: {
-                                'X-API-Key': apiKey,
-                            },
-                            json: true,
-                        }
-                    : {
-                            method: 'POST',
-                            uri: finalUrl,
-                            body,
-                            headers: {
-                                'X-API-Key': apiKey,
-                            },
-                            json: true,
-                        };
+				let finalSchema: unknown = sentryPreset;
+				if (sentryPreset === 'manual' && customSchema !== '') {
+					try {
+						finalSchema = JSON.parse(customSchema);
+					} catch {
+						finalSchema = customSchema;
+					}
+				}
 
-                let responseData = await this.helpers.request!(options as any);
+				const body: IDataObject = {
+					user_id: userId,
+					api_key: apiKey,
+					action: action,
+					payload: payload as IDataObject,
+					target_schema: finalSchema as IDataObject,
+				};
 
-                if (!isAudit && responseData?.status === 'success' && responseData?.data !== undefined) {
-                    responseData = responseData.data;
-                }
+				const options = isAudit
+					? {
+							method: 'GET' as const,
+							url: finalUrl,
+							json: true,
+						}
+					: {
+							method: 'POST' as const,
+							url: finalUrl,
+							body,
+							json: true,
+						};
 
-                if (responseData.status === 'error') {
-                    throw new Error(`Parrot Gate Denied: ${responseData.message}`);
-                }
+				let responseData = (await this.helpers.httpRequestWithAuthentication.call(
+					this,
+					'parrotApi',
+					options,
+				)) as IDataObject;
 
-                returnData.push({ json: responseData as IDataObject });
+				if (!isAudit && responseData?.status === 'success' && responseData?.data !== undefined) {
+					responseData = responseData.data as IDataObject;
+				}
 
-            } catch (error) {
-                if (this.continueOnFail()) {
-                    const message = error instanceof Error ? error.message : String(error);
-                    returnData.push({ json: { error: message } });
-                    continue;
-                }
-                throw error;
-            }
-        }
-        return [returnData];
-    }
+				if (responseData.status === 'error') {
+					throw new NodeOperationError(
+						this.getNode(),
+						`Parrot Gate Denied: ${String(responseData.message ?? 'Unknown error')}`,
+						{ itemIndex: i },
+					);
+				}
+
+				returnData.push({ json: responseData, pairedItem: { item: i } });
+			} catch (error) {
+				if (this.continueOnFail()) {
+					const message = error instanceof Error ? error.message : String(error);
+					returnData.push({ json: { error: message }, pairedItem: { item: i } });
+					continue;
+				}
+				throw new NodeApiError(
+					this.getNode(),
+					asJsonObject(
+						error !== null && typeof error === 'object'
+							? (error as Record<string, unknown>)
+							: { message: String(error) },
+					),
+					{
+						message: error instanceof Error ? error.message : String(error),
+						itemIndex: i,
+					},
+				);
+			}
+		}
+		return [returnData];
+	}
 }

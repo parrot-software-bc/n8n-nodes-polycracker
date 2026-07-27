@@ -1,8 +1,11 @@
 {
   "name": "n8n-nodes-polycracker",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Premium AI orchestration nodes for n8n",
-  "author": "Parrot Integrated Software <parrotsoftwarebc@gmail.com>",
+  "author": {
+    "name": "Parrot Integrated Software",
+    "email": "parrotsoftwarebc@gmail.com"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/parrot-software-bc/n8n-nodes-polycracker.git"
@@ -14,6 +17,7 @@
   "scripts": {
     "build": "tsc && node scripts/copy-assets.js",
     "dev": "tsc --watch",
+    "lint": "eslint nodes/**/*.ts credentials/**/*.ts",
     "prepublishOnly": "npm run build"
   },
   "n8n": {
@@ -27,9 +31,15 @@
       "dist/nodes/ParrotGate/ParrotGate.node.js"
     ]
   },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
   "devDependencies": {
+    "@n8n/eslint-plugin-community-nodes": "^0.26.0",
+    "eslint": "9.29.0",
     "n8n-core": "latest",
     "n8n-workflow": "latest",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.0.0"
   }
 }

@@ -6,7 +6,7 @@ import type {
 	INodeTypeDescription,
 	JsonObject,
 } from 'n8n-workflow';
-import { NodeApiError, NodeOperationError, jsonParse } from 'n8n-workflow';
+import { NodeApiError, NodeConnectionTypes, NodeOperationError, jsonParse } from 'n8n-workflow';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -127,16 +127,21 @@ export class ParrotSmart implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Parrot Smart',
 		name: 'parrotSmart',
-		icon: 'file:parrot.svg',
+		icon: {
+			light: 'file:parrot.svg',
+			dark: 'file:parrot.dark.svg',
+		},
 		group: ['transform'],
 		version: 3,
+		subtitle: '={{$parameter["tier"]}}',
 		description:
-			'Universal AI sequence engine. Choose Guided or Chameleon tiers to eliminate workflow spaghetti and manage session-bound AI data with Polycracker.',
+			'Universal AI sequence engine. Choose Guided or Chameleon tiers to eliminate workflow spaghetti and manage session-bound AI data with Polycracker',
 		defaults: {
 			name: 'Parrot Smart Node',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
+		usableAsTool: true,
 		credentials: [
 			{
 				name: 'parrotApi',
@@ -167,7 +172,7 @@ export class ParrotSmart implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'GPT-4o-mini (Included)', value: 'gpt-4o-mini' },
+					{ name: 'GPT-4O-Mini (Included)', value: 'gpt-4o-mini' },
 					{ name: 'Claude 3.5 Haiku (Apex/Enterprise Only)', value: 'haiku' },
 				],
 			},
@@ -182,7 +187,7 @@ export class ParrotSmart implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'GPT-4o (Standard)', value: 'gpt-4o' },
+					{ name: 'GPT-4O (Standard)', value: 'gpt-4o' },
 					{ name: 'Claude 3.5 Sonnet (Apex/Enterprise Only)', value: 'claude-3-5-sonnet' },
 				],
 			},
@@ -198,29 +203,29 @@ export class ParrotSmart implements INodeType {
 				},
 				options: [
 					{
-						name: 'Data Extraction (Pull clean JSON from messy text)',
+						name: 'Content Generation (Draft Emails, Reports, or Messages)',
+						value: 'generate',
+					},
+					{
+						name: 'Data Extraction (Pull Clean JSON From Messy Text)',
 						value: 'extract',
 					},
 					{
-						name: 'Data Transformation (Reformat data for the next step)',
+						name: 'Data Transformation (Reformat Data for the Next Step)',
 						value: 'transform',
 					},
 					{
-						name: 'Routing & Decision Logic (Output categories or True/False)',
+						name: 'Routing & Decision Logic (Output Categories or True/False)',
 						value: 'route',
 					},
 					{
-						name: 'Summarize & Analyze (Create TL;DRs or action items)',
+						name: 'Summarize & Analyze (Create TL;DRs or Action Items)',
 						value: 'summarize',
-					},
-					{
-						name: 'Content Generation (Draft emails, reports, or messages)',
-						value: 'generate',
 					},
 				],
 			},
 			{
-				displayName: 'Update User Context for this Step?',
+				displayName: 'Update User Context for This Step?',
 				name: 'overrideContext',
 				type: 'boolean',
 				default: false,
@@ -251,7 +256,7 @@ export class ParrotSmart implements INodeType {
 				type: 'boolean',
 				default: false,
 				description:
-					'When enabled, queries the Port 8003 microservice to inject historical context fragments into the run loop to eliminate LLM amnesia.',
+					'Whether to query the Port 8003 microservice to inject historical context fragments into the run loop to eliminate LLM amnesia',
 			},
 			{
 				displayName: 'Vault Label',
@@ -349,15 +354,15 @@ export class ParrotSmart implements INodeType {
 
 			let rawResponse: unknown;
 			try {
-				rawResponse = await this.helpers.request({
+				rawResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'parrotApi', {
 					method: 'POST',
 					url: smartHitUrl,
 					headers: {
-						'X-API-Key': apiKey,
 						'Content-Type': 'application/json',
 						Accept: 'application/json',
 					},
-					body: JSON.stringify(smartHitBody),
+					body: smartHitBody,
+					json: true,
 				});
 			} catch (error) {
 				const statusCode = extractHttpStatusCode(error);

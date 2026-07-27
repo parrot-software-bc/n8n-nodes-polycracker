@@ -6,7 +6,7 @@ import type {
 	INodeTypeDescription,
 	JsonObject,
 } from 'n8n-workflow';
-import { NodeApiError, jsonParse } from 'n8n-workflow';
+import { NodeApiError, NodeConnectionTypes, jsonParse } from 'n8n-workflow';
 
 const LEGACY_METADATA_KEYS = new Set([
 	'workflow',
@@ -56,14 +56,19 @@ export class ParrotIntegration implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Parrot Integration',
 		name: 'parrotIntegration',
-		icon: 'file:parrot.svg',
+		icon: {
+			light: 'file:parrot.svg',
+			dark: 'file:parrot.dark.svg',
+		},
 		group: ['transform'],
 		version: 2,
+		subtitle: '={{$parameter["mission_label"]}}',
 		description:
-			'High-performance session commander for Polycracker. Manages tier-aware routing and authentication for seamless API integration.',
+			'High-performance session commander for Polycracker. Manages tier-aware routing and authentication for seamless API integration',
 		defaults: { name: 'Parrot Integration' },
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
+		usableAsTool: true,
 		credentials: [
 			{
 				name: 'parrotApi',
@@ -89,7 +94,7 @@ export class ParrotIntegration implements INodeType {
 					rows: 6,
 				},
 				description:
-					'Please insert the context or parameters of what you would like to see happen.',
+					'Please insert the context or parameters of what you would like to see happen',
 			},
 		],
 	};
@@ -153,11 +158,10 @@ export class ParrotIntegration implements INodeType {
 
 			let rawResponse: unknown;
 			try {
-				rawResponse = await this.helpers.request({
+				rawResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'parrotApi', {
 					method: 'POST',
 					url: highwayUrl,
 					headers: {
-						'X-API-Key': apiKey,
 						'Content-Type': 'application/json',
 						Accept: 'application/json',
 					},
@@ -265,9 +269,6 @@ export class ParrotIntegration implements INodeType {
 				});
 			}
 		} catch (error) {
-			if (error instanceof NodeApiError) {
-				throw error;
-			}
 			const errObj =
 				error !== null && typeof error === 'object'
 					? asJsonObject(error as Record<string, unknown>)

@@ -1,9 +1,18 @@
-import type { ICredentialType, INodeProperties } from 'n8n-workflow';
+import type {
+	IAuthenticateGeneric,
+	ICredentialTestRequest,
+	ICredentialType,
+	INodeProperties,
+} from 'n8n-workflow';
 
 export class ParrotApi implements ICredentialType {
 	name = 'parrotApi';
 	displayName = 'Parrot API';
-	documentationUrl = '';
+	documentationUrl = 'https://www.polycracker.dev';
+	icon = {
+		light: 'file:parrot.svg',
+		dark: 'file:parrot.dark.svg',
+	} as const;
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API Base URL',
@@ -30,4 +39,21 @@ export class ParrotApi implements ICredentialType {
 			required: true,
 		},
 	];
+
+	authenticate: IAuthenticateGeneric = {
+		type: 'generic',
+		properties: {
+			headers: {
+				'X-API-Key': '={{$credentials.apiKey}}',
+			},
+		},
+	};
+
+	test: ICredentialTestRequest = {
+		request: {
+			baseURL: '={{$credentials.baseUrl}}',
+			url: '/',
+			method: 'GET',
+		},
+	};
 }
