@@ -13,11 +13,7 @@ function asJsonObject(payload: IDataObject | Record<string, unknown>): JsonObjec
 }
 
 function normalizeApiBaseUrl(raw: unknown): string {
-	const base = String(raw ?? '').trim().replace(/\/$/, '');
-	if (!base) {
-		throw new Error('Parrot API credentials must include API Base URL.');
-	}
-	return base;
+	return String(raw ?? '').trim().replace(/\/$/, '');
 }
 
 export class ParrotGate implements INodeType {
@@ -69,13 +65,13 @@ export class ParrotGate implements INodeType {
 				type: 'options',
 				noDataExpression: true,
 				options: [
-					{ name: 'Integrity Master (Heal + Scrub)', value: 'master' },
-					{ name: 'Data Architect (Heal)', value: 'architect' },
-					{ name: 'Custom Alchemist (Advanced)', value: 'alchemist' },
-					{ name: 'Validation Sentry', value: 'sentry' },
-					{ name: 'Privacy Scout (Scrub)', value: 'scout' },
-					{ name: 'Basic Processing (Chirp)', value: 'chirp' },
 					{ name: 'Audit Logs (Quick Look)', value: 'audit' },
+					{ name: 'Basic Processing (Chirp)', value: 'chirp' },
+					{ name: 'Custom Alchemist (Advanced)', value: 'alchemist' },
+					{ name: 'Data Architect (Heal)', value: 'architect' },
+					{ name: 'Integrity Master (Heal + Scrub)', value: 'master' },
+					{ name: 'Privacy Scout (Scrub)', value: 'scout' },
+					{ name: 'Validation Sentry', value: 'sentry' },
 				],
 				default: 'chirp',
 			},
@@ -84,7 +80,6 @@ export class ParrotGate implements INodeType {
 				name: 'payload',
 				type: 'string',
 				default: '',
-				required: false,
 				displayOptions: {
 					hide: {
 						action: ['audit'],
@@ -102,13 +97,13 @@ export class ParrotGate implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'None (Manual Mode)', value: 'manual' },
-					{ name: 'Lead Protection (Name + Email)', value: 'leads' },
-					{ name: 'Financial Audit (Amount + Vendor)', value: 'invoices' },
-					{ name: 'E-commerce Security (Total + SKU)', value: 'ecommerce' },
-					{ name: 'HR Compliance (Salary + Role)', value: 'hr' },
-					{ name: 'Support Optimization (Priority)', value: 'support' },
+					{ name: 'E-Commerce Security (Total + SKU)', value: 'ecommerce' },
 					{ name: 'Enterprise Standard (Strict Validation)', value: 'strict' },
+					{ name: 'Financial Audit (Amount + Vendor)', value: 'invoices' },
+					{ name: 'HR Compliance (Salary + Role)', value: 'hr' },
+					{ name: 'Lead Protection (Name + Email)', value: 'leads' },
+					{ name: 'None (Manual Mode)', value: 'manual' },
+					{ name: 'Support Optimization (Priority)', value: 'support' },
 				],
 				default: 'manual',
 				description: 'Select a pre-built data integrity profile',
@@ -135,14 +130,11 @@ export class ParrotGate implements INodeType {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
 		const credentials = await this.getCredentials('parrotApi');
-
-		let baseUrl: string;
-		try {
-			baseUrl = normalizeApiBaseUrl(credentials.baseUrl);
-		} catch (error) {
+		const baseUrl = normalizeApiBaseUrl(credentials.baseUrl);
+		if (!baseUrl) {
 			throw new NodeOperationError(
 				this.getNode(),
-				error instanceof Error ? error.message : String(error),
+				'Parrot API credentials must include API Base URL.',
 			);
 		}
 

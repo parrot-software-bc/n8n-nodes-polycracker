@@ -6,11 +6,7 @@ function asJsonObject(payload) {
     return payload;
 }
 function normalizeApiBaseUrl(raw) {
-    const base = String(raw !== null && raw !== void 0 ? raw : '').trim().replace(/\/$/, '');
-    if (!base) {
-        throw new Error('Parrot API credentials must include API Base URL.');
-    }
-    return base;
+    return String(raw !== null && raw !== void 0 ? raw : '').trim().replace(/\/$/, '');
 }
 class ParrotGate {
     constructor() {
@@ -59,13 +55,13 @@ class ParrotGate {
                     type: 'options',
                     noDataExpression: true,
                     options: [
-                        { name: 'Integrity Master (Heal + Scrub)', value: 'master' },
-                        { name: 'Data Architect (Heal)', value: 'architect' },
-                        { name: 'Custom Alchemist (Advanced)', value: 'alchemist' },
-                        { name: 'Validation Sentry', value: 'sentry' },
-                        { name: 'Privacy Scout (Scrub)', value: 'scout' },
-                        { name: 'Basic Processing (Chirp)', value: 'chirp' },
                         { name: 'Audit Logs (Quick Look)', value: 'audit' },
+                        { name: 'Basic Processing (Chirp)', value: 'chirp' },
+                        { name: 'Custom Alchemist (Advanced)', value: 'alchemist' },
+                        { name: 'Data Architect (Heal)', value: 'architect' },
+                        { name: 'Integrity Master (Heal + Scrub)', value: 'master' },
+                        { name: 'Privacy Scout (Scrub)', value: 'scout' },
+                        { name: 'Validation Sentry', value: 'sentry' },
                     ],
                     default: 'chirp',
                 },
@@ -74,7 +70,6 @@ class ParrotGate {
                     name: 'payload',
                     type: 'string',
                     default: '',
-                    required: false,
                     displayOptions: {
                         hide: {
                             action: ['audit'],
@@ -92,13 +87,13 @@ class ParrotGate {
                         },
                     },
                     options: [
-                        { name: 'None (Manual Mode)', value: 'manual' },
-                        { name: 'Lead Protection (Name + Email)', value: 'leads' },
-                        { name: 'Financial Audit (Amount + Vendor)', value: 'invoices' },
-                        { name: 'E-commerce Security (Total + SKU)', value: 'ecommerce' },
-                        { name: 'HR Compliance (Salary + Role)', value: 'hr' },
-                        { name: 'Support Optimization (Priority)', value: 'support' },
+                        { name: 'E-Commerce Security (Total + SKU)', value: 'ecommerce' },
                         { name: 'Enterprise Standard (Strict Validation)', value: 'strict' },
+                        { name: 'Financial Audit (Amount + Vendor)', value: 'invoices' },
+                        { name: 'HR Compliance (Salary + Role)', value: 'hr' },
+                        { name: 'Lead Protection (Name + Email)', value: 'leads' },
+                        { name: 'None (Manual Mode)', value: 'manual' },
+                        { name: 'Support Optimization (Priority)', value: 'support' },
                     ],
                     default: 'manual',
                     description: 'Select a pre-built data integrity profile',
@@ -126,12 +121,9 @@ class ParrotGate {
         const items = this.getInputData();
         const returnData = [];
         const credentials = await this.getCredentials('parrotApi');
-        let baseUrl;
-        try {
-            baseUrl = normalizeApiBaseUrl(credentials.baseUrl);
-        }
-        catch (error) {
-            throw new n8n_workflow_1.NodeOperationError(this.getNode(), error instanceof Error ? error.message : String(error));
+        const baseUrl = normalizeApiBaseUrl(credentials.baseUrl);
+        if (!baseUrl) {
+            throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'Parrot API credentials must include API Base URL.');
         }
         const apiKey = String((_a = credentials.apiKey) !== null && _a !== void 0 ? _a : '').trim();
         if (!apiKey) {
