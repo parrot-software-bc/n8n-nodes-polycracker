@@ -1,8 +1,22 @@
 # Polycracker: Official n8n Client for the Polycracker Platform
 
-This package provides the official **Workflow API** integration for the Polycracker AI Orchestration Platform. By installing these nodes, you are connecting your n8n workflows directly to the **Polycracker infrastructure**—a production-grade backend built to eliminate "workflow spaghetti" and enable stateful, multi-step AI execution.
+> **Hire Visual Workflow Employees for n8n.** Drag-and-drop cognitive labor, native multi-agent orchestration, automatic PII redaction, and autonomous JSON healing directly on your canvas.
+
+## 🎥 See It In Action (80s Demo)
+
+
+
+https://github.com/user-attachments/assets/d9d6474e-0b67-4575-a54c-8000494ecbe9
+
+
+
+
+
+*Watch Polycracker parse unstructured field notes, heal broken outputs, automatically redact sensitive PII, and execute complex actuarial math natively in n8n—without the spaghetti.*
 
 ---
+
+This package provides the official Workflow API integration for the Polycracker AI Orchestration Platform. By installing these nodes, you are connecting your n8n workflows directly to the Polycracker infrastructure—a production-grade backend built to eliminate "workflow spaghetti" and enable stateful, multi-step AI execution.
 
 ## 🚀 The Polycracker Ecosystem
 Polycracker is a unified AI orchestration ecosystem designed to power enterprise-grade sequences. Your n8n nodes act as the **Orchestration Client** for our platform, bridging your local canvas with our high-performance backend:
