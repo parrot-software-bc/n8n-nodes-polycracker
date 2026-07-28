@@ -70,8 +70,8 @@ class ParrotGate {
                         {
                             name: 'Custom Alchemist (Advanced)',
                             value: 'alchemist',
-                            action: 'Executes advanced, custom processing logic on the backend',
-                            description: 'Executes advanced, custom processing logic on the backend',
+                            action: 'Execute advanced custom processing logic on the backend',
+                            description: 'Execute advanced custom processing logic on the backend',
                         },
                         {
                             name: 'Data Architect (Heal)',
@@ -110,7 +110,7 @@ class ParrotGate {
                             action: ['audit'],
                         },
                     },
-                    description: 'The raw JSON or text data that needs to be scrubbed, healed, or validated. Inject the messy data here',
+                    description: 'The raw JSON or text data that needs to be scrubbed, healed, or validated. Inject the messy data here.',
                 },
                 {
                     displayName: 'Privacy Guardrail',
