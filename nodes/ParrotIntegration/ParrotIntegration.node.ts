@@ -64,7 +64,7 @@ export class ParrotIntegration implements INodeType {
 		version: 2,
 		subtitle: '={{$parameter["mission_label"]}}',
 		description:
-			'High-performance session commander for Polycracker. Manages tier-aware routing and authentication for seamless API integration',
+			'Use this tool FIRST to initialize a Polycracker mission. This tool generates the required code_jwt authentication baton. You MUST run this tool and pass its output to the Parrot Smart tool before processing data.',
 		defaults: { name: 'Parrot Integration' },
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main],
@@ -82,6 +82,7 @@ export class ParrotIntegration implements INodeType {
 				type: 'string',
 				default: 'General_Park_Project',
 				required: true,
+				description: 'A unique string label for the mission. Required to generate the authentication baton.',
 			},
 			{
 				displayName: 'User Context',
@@ -94,7 +95,7 @@ export class ParrotIntegration implements INodeType {
 					rows: 6,
 				},
 				description:
-					'Please insert the context or parameters of what you would like to see happen',
+					'The specific goal or instructions for this mission. Summarize what the user wants to achieve.',
 			},
 		],
 	};

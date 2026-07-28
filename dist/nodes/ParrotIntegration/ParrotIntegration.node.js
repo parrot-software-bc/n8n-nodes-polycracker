@@ -53,7 +53,7 @@ class ParrotIntegration {
             group: ['transform'],
             version: 2,
             subtitle: '={{$parameter["mission_label"]}}',
-            description: 'High-performance session commander for Polycracker. Manages tier-aware routing and authentication for seamless API integration',
+            description: 'Use this tool FIRST to initialize a Polycracker mission. This tool generates the required code_jwt authentication baton. You MUST run this tool and pass its output to the Parrot Smart tool before processing data.',
             defaults: { name: 'Parrot Integration' },
             inputs: [n8n_workflow_1.NodeConnectionTypes.Main],
             outputs: [n8n_workflow_1.NodeConnectionTypes.Main],
@@ -71,6 +71,7 @@ class ParrotIntegration {
                     type: 'string',
                     default: 'General_Park_Project',
                     required: true,
+                    description: 'A unique string label for the mission. Required to generate the authentication baton.',
                 },
                 {
                     displayName: 'User Context',
@@ -82,7 +83,7 @@ class ParrotIntegration {
                     typeOptions: {
                         rows: 6,
                     },
-                    description: 'Please insert the context or parameters of what you would like to see happen',
+                    description: 'The specific goal or instructions for this mission. Summarize what the user wants to achieve.',
                 },
             ],
         };

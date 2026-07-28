@@ -28,7 +28,7 @@ export class ParrotGate implements INodeType {
 		version: 2,
 		subtitle: '={{$parameter["action"]}}',
 		description:
-			'Privacy-first gateway for Polycracker. Provides schema healing, data scrubbing, and secure API access',
+			'Standalone privacy gateway tool. Use this to heal schemas, scrub PII, and sanitize raw text or JSON payloads instantly.',
 		defaults: {
 			name: 'Parrot Gate',
 		},
@@ -64,14 +64,44 @@ export class ParrotGate implements INodeType {
 				name: 'action',
 				type: 'options',
 				noDataExpression: true,
+				description: 'Select the specific cleaning or validation operation to perform on the payload.',
 				options: [
-					{ name: 'Audit Logs (Quick Look)', value: 'audit' },
-					{ name: 'Basic Processing (Chirp)', value: 'chirp' },
-					{ name: 'Custom Alchemist (Advanced)', value: 'alchemist' },
-					{ name: 'Data Architect (Heal)', value: 'architect' },
-					{ name: 'Integrity Master (Heal + Scrub)', value: 'master' },
-					{ name: 'Privacy Scout (Scrub)', value: 'scout' },
-					{ name: 'Validation Sentry', value: 'sentry' },
+					{
+						name: 'Audit Logs (Quick Look)',
+						value: 'audit',
+						description: 'Fetches processing history logs without altering the payload.',
+					},
+					{
+						name: 'Basic Processing (Chirp)',
+						value: 'chirp',
+						description: 'Executes basic gateway processing on the payload.',
+					},
+					{
+						name: 'Custom Alchemist (Advanced)',
+						value: 'alchemist',
+						description: 'Executes advanced, custom processing logic on the backend.',
+					},
+					{
+						name: 'Data Architect (Heal)',
+						value: 'architect',
+						description: 'Heals the payload schema to repair broken or malformed data structures.',
+					},
+					{
+						name: 'Integrity Master (Heal + Scrub)',
+						value: 'master',
+						description:
+							'Performs a combined operation to both heal the schema and scrub PII from the payload.',
+					},
+					{
+						name: 'Privacy Scout (Scrub)',
+						value: 'scout',
+						description: 'Performs privacy scrubbing to remove sensitive PII from the payload.',
+					},
+					{
+						name: 'Validation Sentry',
+						value: 'sentry',
+						description: 'Validates the payload strictly against the selected target schema.',
+					},
 				],
 				default: 'chirp',
 			},
@@ -85,7 +115,8 @@ export class ParrotGate implements INodeType {
 						action: ['audit'],
 					},
 				},
-				description: 'Leave empty to process all incoming data',
+				description:
+					'The raw JSON or text data that needs to be scrubbed, healed, or validated. Inject the messy data here.',
 			},
 			{
 				displayName: 'Privacy Guardrail',
@@ -96,17 +127,45 @@ export class ParrotGate implements INodeType {
 						action: ['audit'],
 					},
 				},
+				description: 'Select the specific data integrity profile to apply.',
 				options: [
-					{ name: 'E-Commerce Security (Total + SKU)', value: 'ecommerce' },
-					{ name: 'Enterprise Standard (Strict Validation)', value: 'strict' },
-					{ name: 'Financial Audit (Amount + Vendor)', value: 'invoices' },
-					{ name: 'HR Compliance (Salary + Role)', value: 'hr' },
-					{ name: 'Lead Protection (Name + Email)', value: 'leads' },
-					{ name: 'None (Manual Mode)', value: 'manual' },
-					{ name: 'Support Optimization (Priority)', value: 'support' },
+					{
+						name: 'E-Commerce Security (Total + SKU)',
+						value: 'ecommerce',
+						description: 'Applies validation rules tailored for total amounts and SKUs.',
+					},
+					{
+						name: 'Enterprise Standard (Strict Validation)',
+						value: 'strict',
+						description: 'Applies the strict enterprise validation profile.',
+					},
+					{
+						name: 'Financial Audit (Amount + Vendor)',
+						value: 'invoices',
+						description: 'Applies validation rules tailored for financial amounts and vendor data.',
+					},
+					{
+						name: 'HR Compliance (Salary + Role)',
+						value: 'hr',
+						description: 'Applies compliance rules tailored for salary and role data.',
+					},
+					{
+						name: 'Lead Protection (Name + Email)',
+						value: 'leads',
+						description: 'Applies protection rules tailored for names and emails.',
+					},
+					{
+						name: 'None (Manual Mode)',
+						value: 'manual',
+						description: 'Applies no preset profile; uses manual mode or a custom JSON schema.',
+					},
+					{
+						name: 'Support Optimization (Priority)',
+						value: 'support',
+						description: 'Applies validation rules tailored for support priority data.',
+					},
 				],
 				default: 'manual',
-				description: 'Select a pre-built data integrity profile',
 			},
 			{
 				displayName: 'Custom JSON Schema',
