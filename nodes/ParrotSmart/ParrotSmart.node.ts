@@ -156,19 +156,19 @@ export class ParrotSmart implements INodeType {
 				noDataExpression: true,
 				default: TIER_GUIDED,
 				required: true,
-				description: 'Select the processing tier to use for this task.',
+				description: 'Select the processing tier to use for this task',
 				options: [
 					{
 						name: 'Guided (5c)',
 						value: 'guided',
 						description:
-							'Executes a predefined task type (like extraction or summarization) using the Guided API tier.',
+							'Executes a predefined task type (like extraction or summarization) using the Guided API tier',
 					},
 					{
 						name: 'Chameleon (20c)',
 						value: 'chameleon',
 						description:
-							'Executes complex reasoning and dynamic logic integrity checks using the Chameleon API tier.',
+							'Executes complex reasoning and dynamic logic integrity checks using the Chameleon API tier',
 					},
 				],
 			},
@@ -182,17 +182,17 @@ export class ParrotSmart implements INodeType {
 						tier: ['guided'],
 					},
 				},
-				description: 'Select the specific LLM to use for the Guided tier.',
+				description: 'Select the specific LLM to use for the Guided tier',
 				options: [
 					{
 						name: 'GPT-4O-Mini (Included)',
 						value: 'gpt-4o-mini',
-						description: 'Standard included AI model for standard tasks.',
+						description: 'Standard included AI model for standard tasks',
 					},
 					{
 						name: 'Claude 3.5 Haiku (Apex/Enterprise Only)',
 						value: 'haiku',
-						description: 'High-speed enterprise AI model (Requires Apex/Enterprise tier).',
+						description: 'High-speed enterprise AI model (Requires Apex/Enterprise tier)',
 					},
 				],
 			},
@@ -206,17 +206,17 @@ export class ParrotSmart implements INodeType {
 						tier: ['chameleon'],
 					},
 				},
-				description: 'Select the specific LLM to use for the Chameleon tier.',
+				description: 'Select the specific LLM to use for the Chameleon tier',
 				options: [
 					{
 						name: 'GPT-4O (Standard)',
 						value: 'gpt-4o',
-						description: 'Standard advanced reasoning model.',
+						description: 'Standard advanced reasoning model',
 					},
 					{
 						name: 'Claude 3.5 Sonnet (Apex/Enterprise Only)',
 						value: 'claude-3-5-sonnet',
-						description: 'Enterprise deep-reasoning model (Requires Apex/Enterprise tier).',
+						description: 'Enterprise deep-reasoning model (Requires Apex/Enterprise tier)',
 					},
 				],
 			},
@@ -230,32 +230,31 @@ export class ParrotSmart implements INodeType {
 						tier: ['guided'],
 					},
 				},
-				description: 'The specific data processing operation to perform on the payload.',
 				options: [
 					{
 						name: 'Content Generation (Draft Emails, Reports, or Messages)',
 						value: 'generate',
-						description: 'Drafts new content, emails, reports, or messages.',
+						description: 'Drafts new content, emails, reports, or messages',
 					},
 					{
 						name: 'Data Extraction (Pull Clean JSON From Messy Text)',
 						value: 'extract',
-						description: 'Pulls clean JSON and structured data out of messy text.',
+						description: 'Pulls clean JSON and structured data out of messy text',
 					},
 					{
 						name: 'Data Transformation (Reformat Data for the Next Step)',
 						value: 'transform',
-						description: 'Reformats the data structure for the next step in a pipeline.',
+						description: 'Reformats the data structure for the next step in a pipeline',
 					},
 					{
 						name: 'Routing & Decision Logic (Output Categories or True/False)',
 						value: 'route',
-						description: 'Analyzes the payload to output categories or true/false routing decisions.',
+						description: 'Analyzes the payload to output categories or true/false routing decisions',
 					},
 					{
 						name: 'Summarize & Analyze (Create TL;DRs or Action Items)',
 						value: 'summarize',
-						description: 'Analyzes the payload to create concise TL;DRs or action items.',
+						description: 'Analyzes the payload to create concise TL;DRs or action items',
 					},
 				],
 			},
@@ -269,7 +268,8 @@ export class ParrotSmart implements INodeType {
 						tier: ['guided'],
 					},
 				},
-				description: 'Set to true to inject specific, overriding instructions for this processing step.',
+				description:
+					'Whether to inject specific, overriding instructions for this processing step',
 			},
 			{
 				displayName: 'New Context / Instructions',
@@ -285,7 +285,7 @@ export class ParrotSmart implements INodeType {
 						overrideContext: [true],
 					},
 				},
-				description: 'The specific custom text instructions or constraints for the model to follow.',
+				description: 'The specific custom text instructions or constraints for the model to follow',
 			},
 			{
 				displayName: 'Enable Production Vault Memory',
@@ -306,7 +306,7 @@ export class ParrotSmart implements INodeType {
 					},
 				},
 				description:
-					'The unique string identifier of the production vault used for memory and historical context injection.',
+					'The unique string identifier of the production vault used for memory and historical context injection',
 			},
 		],
 	};

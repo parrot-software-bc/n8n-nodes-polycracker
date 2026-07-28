@@ -71,7 +71,7 @@ class ParrotIntegration {
                     type: 'string',
                     default: 'General_Park_Project',
                     required: true,
-                    description: 'A unique string label for the mission. Required to generate the authentication baton.',
+                    description: 'A unique string label for the mission. Required to generate the authentication baton',
                 },
                 {
                     displayName: 'User Context',
@@ -83,7 +83,7 @@ class ParrotIntegration {
                     typeOptions: {
                         rows: 6,
                     },
-                    description: 'The specific goal or instructions for this mission. Summarize what the user wants to achieve.',
+                    description: 'The specific goal or instructions for this mission. Summarize what the user wants to achieve',
                 },
             ],
         };

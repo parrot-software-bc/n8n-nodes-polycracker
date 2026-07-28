@@ -82,7 +82,7 @@ export class ParrotIntegration implements INodeType {
 				type: 'string',
 				default: 'General_Park_Project',
 				required: true,
-				description: 'A unique string label for the mission. Required to generate the authentication baton.',
+				description: 'A unique string label for the mission. Required to generate the authentication baton',
 			},
 			{
 				displayName: 'User Context',
@@ -95,7 +95,7 @@ export class ParrotIntegration implements INodeType {
 					rows: 6,
 				},
 				description:
-					'The specific goal or instructions for this mission. Summarize what the user wants to achieve.',
+					'The specific goal or instructions for this mission. Summarize what the user wants to achieve',
 			},
 		],
 	};
