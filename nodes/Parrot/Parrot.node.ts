@@ -394,7 +394,7 @@ async function executeSmart(
 	return [returnData];
 }
 
-export class ParrotGate implements INodeType {
+export class Parrot implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Parrot',
 		name: 'parrot',
@@ -523,8 +523,8 @@ export class ParrotGate implements INodeType {
 					{
 						name: 'Process Mission',
 						value: 'process',
-						action: 'Initialize a Polycracker mission and generate the code_jwt baton',
-						description: 'Initialize a Polycracker mission and generate the code_jwt baton',
+						action: 'Initialize a polycracker mission and generate the code JWT baton',
+						description: 'Initialize a polycracker mission and generate the code JWT baton',
 					},
 				],
 				default: 'process',
@@ -543,8 +543,8 @@ export class ParrotGate implements INodeType {
 					{
 						name: 'Execute',
 						value: 'execute',
-						action: 'Execute advanced AI data processing with a code_jwt baton',
-						description: 'Execute advanced AI data processing with a code_jwt baton',
+						action: 'Execute advanced AI data processing with a code JWT baton',
+						description: 'Execute advanced AI data processing with a code JWT baton',
 					},
 				],
 				default: 'execute',

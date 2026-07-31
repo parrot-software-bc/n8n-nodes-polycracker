@@ -1,6 +1,6 @@
 {
     "name": "n8n-nodes-polycracker",
-    "version": "1.1.1",
+    "version": "1.1.3",
     "description": "Premium AI orchestration nodes for n8n",
     "author": {
         "name": "Parrot Integrated Software",
@@ -27,7 +27,7 @@
             "dist/credentials/ParrotApi.credentials.js"
         ],
         "nodes": [
-            "dist/nodes/ParrotGate/ParrotGate.node.js"
+            "dist/nodes/Parrot/Parrot.node.js"
         ]
     },
     "peerDependencies": {

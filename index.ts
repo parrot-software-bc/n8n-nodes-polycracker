@@ -1,1 +1,1 @@
-export * from './nodes/ParrotGate/ParrotGate.node';
+export * from './nodes/Parrot/Parrot.node';

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParrotGate = void 0;
+exports.Parrot = void 0;
 const n8n_workflow_1 = require("n8n-workflow");
 const helpers_1 = require("./helpers");
 async function executeGate(context, items, returnData, baseUrl, userId) {
@@ -289,7 +289,7 @@ async function executeSmart(context, items, returnData, baseUrl, userId) {
     }
     return [returnData];
 }
-class ParrotGate {
+class Parrot {
     constructor() {
         this.description = {
             displayName: 'Parrot',
@@ -415,8 +415,8 @@ class ParrotGate {
                         {
                             name: 'Process Mission',
                             value: 'process',
-                            action: 'Initialize a Polycracker mission and generate the code_jwt baton',
-                            description: 'Initialize a Polycracker mission and generate the code_jwt baton',
+                            action: 'Initialize a polycracker mission and generate the code JWT baton',
+                            description: 'Initialize a polycracker mission and generate the code JWT baton',
                         },
                     ],
                     default: 'process',
@@ -435,8 +435,8 @@ class ParrotGate {
                         {
                             name: 'Execute',
                             value: 'execute',
-                            action: 'Execute advanced AI data processing with a code_jwt baton',
-                            description: 'Execute advanced AI data processing with a code_jwt baton',
+                            action: 'Execute advanced AI data processing with a code JWT baton',
+                            description: 'Execute advanced AI data processing with a code JWT baton',
                         },
                     ],
                     default: 'execute',
@@ -771,5 +771,5 @@ class ParrotGate {
         throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Unsupported resource: ${resource}`);
     }
 }
-exports.ParrotGate = ParrotGate;
-//# sourceMappingURL=ParrotGate.node.js.map
+exports.Parrot = Parrot;
+//# sourceMappingURL=Parrot.node.js.map
