@@ -1,0 +1,12 @@
+import type { IDataObject, JsonObject } from 'n8n-workflow';
+export declare const TIER_GUIDED: "guided";
+export declare const TIER_CHAMELEON: "chameleon";
+export type TierParam = typeof TIER_GUIDED | typeof TIER_CHAMELEON;
+export declare function asJsonObject(payload: IDataObject | Record<string, unknown>): JsonObject;
+export declare function isRecord(value: unknown): value is Record<string, unknown>;
+export declare function normalizeApiBaseUrl(raw: unknown): string;
+export declare function normalizeParrotGateUrlForIpv6(url: string): string;
+export declare function buildCleanMetadata(source: IDataObject): IDataObject;
+export declare function buildCleanUserData(source: IDataObject): IDataObject;
+export declare function extractSmartPlusIntegrityMessage(body: unknown): string | undefined;
+export declare function extractHttpStatusCode(error: unknown): number | undefined;
