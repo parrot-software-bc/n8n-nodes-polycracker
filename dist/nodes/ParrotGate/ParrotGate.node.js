@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Parrot = void 0;
+exports.ParrotGate = void 0;
 const n8n_workflow_1 = require("n8n-workflow");
 const helpers_1 = require("./helpers");
 async function executeGate(context, items, returnData, baseUrl, userId) {
@@ -289,7 +289,7 @@ async function executeSmart(context, items, returnData, baseUrl, userId) {
     }
     return [returnData];
 }
-class Parrot {
+class ParrotGate {
     constructor() {
         this.description = {
             displayName: 'Parrot',
@@ -771,5 +771,5 @@ class Parrot {
         throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Unsupported resource: ${resource}`);
     }
 }
-exports.Parrot = Parrot;
+exports.ParrotGate = ParrotGate;
 //# sourceMappingURL=ParrotGate.node.js.map

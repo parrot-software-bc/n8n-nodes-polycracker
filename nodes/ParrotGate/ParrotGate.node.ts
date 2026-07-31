@@ -394,7 +394,7 @@ async function executeSmart(
 	return [returnData];
 }
 
-export class Parrot implements INodeType {
+export class ParrotGate implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Parrot',
 		name: 'parrot',

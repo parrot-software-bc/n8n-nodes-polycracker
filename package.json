@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-polycracker",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Premium AI orchestration nodes for n8n",
   "author": {
     "name": "Parrot Integrated Software",
@@ -13,7 +13,7 @@
   "homepage": "https://github.com/parrot-software-bc/n8n-nodes-polycracker#readme",
   "keywords": ["n8n-community-node-package"],
   "license": "MIT",
-  "main": "index.js",
+  "main": "dist/index.js",
   "files": ["dist"],
   "scripts": {
     "build": "tsc && node scripts/copy-assets.js",
