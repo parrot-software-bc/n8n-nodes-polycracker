@@ -1,6 +1,6 @@
 {
     "name": "n8n-nodes-polycracker",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "Polycracker AI orchestration nodes for n8n",
     "author": {
         "name": "Parrot Integrated Software",
