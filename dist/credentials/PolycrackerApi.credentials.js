@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParrotApi = void 0;
-class ParrotApi {
+exports.PolycrackerApi = void 0;
+class PolycrackerApi {
     constructor() {
-        this.name = 'parrotApi';
-        this.displayName = 'Parrot API';
+        this.name = 'polycrackerApi';
+        this.displayName = 'Polycracker API';
         this.documentationUrl = 'https://www.polycracker.dev';
         this.icon = {
-            light: 'file:parrot.svg',
-            dark: 'file:parrot.dark.svg',
+            light: 'file:polycracker.svg',
+            dark: 'file:polycracker.dark.svg',
         };
         this.properties = [
             {
@@ -53,5 +53,5 @@ class ParrotApi {
         };
     }
 }
-exports.ParrotApi = ParrotApi;
-//# sourceMappingURL=ParrotApi.credentials.js.map
+exports.PolycrackerApi = PolycrackerApi;
+//# sourceMappingURL=PolycrackerApi.credentials.js.map

@@ -1,5 +1,5 @@
 {
-	"node": "n8n-nodes-polycracker.parrot",
+	"node": "n8n-nodes-polycracker.polycracker",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Utility"],

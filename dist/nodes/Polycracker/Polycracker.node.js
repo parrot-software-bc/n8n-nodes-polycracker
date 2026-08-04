@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Parrot = void 0;
+exports.Polycracker = void 0;
 const n8n_workflow_1 = require("n8n-workflow");
 const helpers_1 = require("./helpers");
 async function executeGate(context, items, returnData, baseUrl, userId) {
@@ -45,12 +45,12 @@ async function executeGate(context, items, returnData, baseUrl, userId) {
                     body,
                     json: true,
                 };
-            let responseData = (await context.helpers.httpRequestWithAuthentication.call(context, 'parrotApi', options));
+            let responseData = (await context.helpers.httpRequestWithAuthentication.call(context, 'polycrackerApi', options));
             if (!isAudit && (responseData === null || responseData === void 0 ? void 0 : responseData.status) === 'success' && (responseData === null || responseData === void 0 ? void 0 : responseData.data) !== undefined) {
                 responseData = responseData.data;
             }
             if (responseData.status === 'error') {
-                throw new n8n_workflow_1.NodeOperationError(context.getNode(), `Parrot Gate Denied: ${String((_a = responseData.message) !== null && _a !== void 0 ? _a : 'Unknown error')}`, { itemIndex: i });
+                throw new n8n_workflow_1.NodeOperationError(context.getNode(), `Polycracker Gate Denied: ${String((_a = responseData.message) !== null && _a !== void 0 ? _a : 'Unknown error')}`, { itemIndex: i });
             }
             returnData.push({ json: responseData, pairedItem: { item: i } });
         }
@@ -96,7 +96,7 @@ async function executeIntegration(context, items, returnData, baseUrl, userId) {
     const cleanMetadata = (0, helpers_1.buildCleanMetadata)(firstSourceJson);
     let rawResponse;
     try {
-        rawResponse = await context.helpers.httpRequestWithAuthentication.call(context, 'parrotApi', {
+        rawResponse = await context.helpers.httpRequestWithAuthentication.call(context, 'polycrackerApi', {
             method: 'POST',
             url: highwayUrl,
             headers: {
@@ -130,7 +130,7 @@ async function executeIntegration(context, items, returnData, baseUrl, userId) {
         }
         if (statusCode === 402) {
             throw new n8n_workflow_1.NodeApiError(context.getNode(), (0, helpers_1.asJsonObject)(errorRecord !== null && errorRecord !== void 0 ? errorRecord : {}), {
-                message: 'Out of Fuel. Please refill your Parrot compute credits to continue.',
+                message: 'Out of Fuel. Please refill your Polycracker compute credits to continue.',
                 itemIndex: firstItemIndex,
             });
         }
@@ -145,7 +145,7 @@ async function executeIntegration(context, items, returnData, baseUrl, userId) {
             lowerMessage.includes('socket hang up');
         if (isTimeoutOrNetwork) {
             throw new n8n_workflow_1.NodeApiError(context.getNode(), (0, helpers_1.asJsonObject)(errorRecord !== null && errorRecord !== void 0 ? errorRecord : {}), {
-                message: 'The Parrot AI took too long to respond. Please check your Gateway connection.',
+                message: 'The Polycracker AI took too long to respond. Please check your Gateway connection.',
                 itemIndex: firstItemIndex,
             });
         }
@@ -190,7 +190,7 @@ async function executeIntegration(context, items, returnData, baseUrl, userId) {
 }
 async function executeSmart(context, items, returnData, baseUrl, userId) {
     var _a, _b, _c, _d, _e, _f;
-    const smartHitUrl = (0, helpers_1.normalizeParrotGateUrlForIpv6)(`${baseUrl}/highway/smart-hit`);
+    const smartHitUrl = (0, helpers_1.normalizeApiUrlForIpv6)(`${baseUrl}/highway/smart-hit`);
     const workflowId = (_a = context.getWorkflow().id) !== null && _a !== void 0 ? _a : 'n8n_workflow';
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
@@ -212,7 +212,7 @@ async function executeSmart(context, items, returnData, baseUrl, userId) {
         const rawCodeJwt = incomingJson.code_jwt;
         const sequenceJwt = rawCodeJwt === undefined || rawCodeJwt === null ? '' : String(rawCodeJwt).trim();
         if (!sequenceJwt) {
-            throw new n8n_workflow_1.NodeOperationError(context.getNode(), 'code_jwt is required: run Parrot Integration (or upstream node) to provide the sequence baton before Parrot Smart.', { itemIndex: i });
+            throw new n8n_workflow_1.NodeOperationError(context.getNode(), 'code_jwt is required: run Polycracker Integration (or upstream node) to provide the sequence baton before Polycracker Smart.', { itemIndex: i });
         }
         const apiPayloadData = { ...incomingJson };
         if (tier === helpers_1.TIER_GUIDED) {
@@ -237,7 +237,7 @@ async function executeSmart(context, items, returnData, baseUrl, userId) {
         };
         let rawResponse;
         try {
-            rawResponse = await context.helpers.httpRequestWithAuthentication.call(context, 'parrotApi', {
+            rawResponse = await context.helpers.httpRequestWithAuthentication.call(context, 'polycrackerApi', {
                 method: 'POST',
                 url: smartHitUrl,
                 headers: {
@@ -289,34 +289,34 @@ async function executeSmart(context, items, returnData, baseUrl, userId) {
     }
     return [returnData];
 }
-class Parrot {
+class Polycracker {
     constructor() {
         this.description = {
-            displayName: 'Parrot',
-            name: 'parrot',
+            displayName: 'Polycracker',
+            name: 'polycracker',
             icon: {
-                light: 'file:parrot-green.svg',
-                dark: 'file:parrot-green.dark.svg',
+                light: 'file:polycracker.svg',
+                dark: 'file:polycracker.dark.svg',
             },
             group: ['transform'],
-            version: 1,
+            version: 2,
             subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
             description: 'Polycracker AI orchestration: privacy gateway, mission integration, and smart processing in one node.',
             defaults: {
-                name: 'Parrot',
+                name: 'Polycracker',
             },
             inputs: [n8n_workflow_1.NodeConnectionTypes.Main],
             outputs: [n8n_workflow_1.NodeConnectionTypes.Main],
             usableAsTool: true,
             credentials: [
                 {
-                    name: 'parrotApi',
+                    name: 'polycrackerApi',
                     required: true,
                 },
             ],
             properties: [
                 {
-                    displayName: 'First time? <a href="https://portal.polycracker.dev/dashboard?action=register" target="_blank" rel="noopener noreferrer" style="color:#2563eb;font-weight:700;text-decoration:underline">Register for Parrot</a> to get your User ID and API Key, then add them to your <strong>Parrot API</strong> credential.',
+                    displayName: 'First time? <a href="https://portal.polycracker.dev/dashboard?action=register" target="_blank" rel="noopener noreferrer" style="color:#2563eb;font-weight:700;text-decoration:underline">Register for Polycracker</a> to get your User ID and API Key, then add them to your <strong>Polycracker API</strong> credential.',
                     name: 'registerNotice',
                     type: 'notice',
                     typeOptions: {
@@ -331,19 +331,19 @@ class Parrot {
                     noDataExpression: true,
                     options: [
                         {
-                            name: 'Parrot Gate',
-                            value: 'parrotGate',
+                            name: 'Polycracker Gate',
+                            value: 'polycrackerGate',
                         },
                         {
-                            name: 'Parrot Integration',
-                            value: 'parrotIntegration',
+                            name: 'Polycracker Integration',
+                            value: 'polycrackerIntegration',
                         },
                         {
-                            name: 'Parrot Smart',
-                            value: 'parrotSmart',
+                            name: 'Polycracker Smart',
+                            value: 'polycrackerSmart',
                         },
                     ],
-                    default: 'parrotGate',
+                    default: 'polycrackerGate',
                 },
                 {
                     displayName: 'Operation',
@@ -352,7 +352,7 @@ class Parrot {
                     noDataExpression: true,
                     displayOptions: {
                         show: {
-                            resource: ['parrotGate'],
+                            resource: ['polycrackerGate'],
                         },
                     },
                     options: [
@@ -408,7 +408,7 @@ class Parrot {
                     noDataExpression: true,
                     displayOptions: {
                         show: {
-                            resource: ['parrotIntegration'],
+                            resource: ['polycrackerIntegration'],
                         },
                     },
                     options: [
@@ -428,7 +428,7 @@ class Parrot {
                     noDataExpression: true,
                     displayOptions: {
                         show: {
-                            resource: ['parrotSmart'],
+                            resource: ['polycrackerSmart'],
                         },
                     },
                     options: [
@@ -442,13 +442,13 @@ class Parrot {
                     default: 'execute',
                 },
                 {
-                    displayName: '**Parrot Gate Quick Start:**\n1. Configure your **Parrot API** credential (Base URL, API Key, User ID).\n2. Select your **Operation** (The AI&apos;s job).\n3. Set a **Privacy Guardrail** (Target Schema) if required.\n4. Map your **Payload** (or leave blank to auto-process incoming data).',
+                    displayName: '**Polycracker Gate Quick Start:**\n1. Configure your **Polycracker API** credential (Base URL, API Key, User ID).\n2. Select your **Operation** (The AI&apos;s job).\n3. Set a **Privacy Guardrail** (Target Schema) if required.\n4. Map your **Payload** (or leave blank to auto-process incoming data).',
                     name: 'gateQuickStartNotice',
                     type: 'notice',
                     default: '',
                     displayOptions: {
                         show: {
-                            resource: ['parrotGate'],
+                            resource: ['polycrackerGate'],
                         },
                     },
                 },
@@ -459,7 +459,7 @@ class Parrot {
                     default: '',
                     displayOptions: {
                         show: {
-                            resource: ['parrotGate'],
+                            resource: ['polycrackerGate'],
                         },
                         hide: {
                             operation: ['audit'],
@@ -473,7 +473,7 @@ class Parrot {
                     type: 'options',
                     displayOptions: {
                         show: {
-                            resource: ['parrotGate'],
+                            resource: ['polycrackerGate'],
                         },
                         hide: {
                             operation: ['audit'],
@@ -525,7 +525,7 @@ class Parrot {
                     type: 'string',
                     displayOptions: {
                         show: {
-                            resource: ['parrotGate'],
+                            resource: ['polycrackerGate'],
                             target_schema: ['manual'],
                         },
                         hide: {
@@ -543,7 +543,7 @@ class Parrot {
                     required: true,
                     displayOptions: {
                         show: {
-                            resource: ['parrotIntegration'],
+                            resource: ['polycrackerIntegration'],
                             operation: ['process'],
                         },
                     },
@@ -561,7 +561,7 @@ class Parrot {
                     },
                     displayOptions: {
                         show: {
-                            resource: ['parrotIntegration'],
+                            resource: ['polycrackerIntegration'],
                             operation: ['process'],
                         },
                     },
@@ -576,7 +576,7 @@ class Parrot {
                     required: true,
                     displayOptions: {
                         show: {
-                            resource: ['parrotSmart'],
+                            resource: ['polycrackerSmart'],
                             operation: ['execute'],
                         },
                     },
@@ -601,7 +601,7 @@ class Parrot {
                     default: 'gpt-4o-mini',
                     displayOptions: {
                         show: {
-                            resource: ['parrotSmart'],
+                            resource: ['polycrackerSmart'],
                             operation: ['execute'],
                             tier: ['guided'],
                         },
@@ -627,7 +627,7 @@ class Parrot {
                     default: 'gpt-4o',
                     displayOptions: {
                         show: {
-                            resource: ['parrotSmart'],
+                            resource: ['polycrackerSmart'],
                             operation: ['execute'],
                             tier: ['chameleon'],
                         },
@@ -653,7 +653,7 @@ class Parrot {
                     default: 'extract',
                     displayOptions: {
                         show: {
-                            resource: ['parrotSmart'],
+                            resource: ['polycrackerSmart'],
                             operation: ['execute'],
                             tier: ['guided'],
                         },
@@ -693,7 +693,7 @@ class Parrot {
                     default: false,
                     displayOptions: {
                         show: {
-                            resource: ['parrotSmart'],
+                            resource: ['polycrackerSmart'],
                             operation: ['execute'],
                             tier: ['guided'],
                         },
@@ -710,7 +710,7 @@ class Parrot {
                     },
                     displayOptions: {
                         show: {
-                            resource: ['parrotSmart'],
+                            resource: ['polycrackerSmart'],
                             operation: ['execute'],
                             tier: ['guided'],
                             overrideContext: [true],
@@ -725,7 +725,7 @@ class Parrot {
                     default: false,
                     displayOptions: {
                         show: {
-                            resource: ['parrotSmart'],
+                            resource: ['polycrackerSmart'],
                             operation: ['execute'],
                         },
                     },
@@ -738,7 +738,7 @@ class Parrot {
                     default: 'primary',
                     displayOptions: {
                         show: {
-                            resource: ['parrotSmart'],
+                            resource: ['polycrackerSmart'],
                             operation: ['execute'],
                             useVault: [true],
                         },
@@ -752,24 +752,24 @@ class Parrot {
         var _a;
         const items = this.getInputData();
         const returnData = [];
-        const credentials = await this.getCredentials('parrotApi');
+        const credentials = await this.getCredentials('polycrackerApi');
         const baseUrl = (0, helpers_1.normalizeApiBaseUrl)(credentials.baseUrl);
         if (!baseUrl) {
-            throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'Parrot API credentials must include API Base URL.');
+            throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'Polycracker API credentials must include API Base URL.');
         }
         const userId = String((_a = credentials.userId) !== null && _a !== void 0 ? _a : '').trim() || 'n8n_user';
         const resource = this.getNodeParameter('resource', 0);
-        if (resource === 'parrotGate') {
+        if (resource === 'polycrackerGate') {
             return executeGate(this, items, returnData, baseUrl, userId);
         }
-        if (resource === 'parrotIntegration') {
+        if (resource === 'polycrackerIntegration') {
             return executeIntegration(this, items, returnData, baseUrl, userId);
         }
-        if (resource === 'parrotSmart') {
+        if (resource === 'polycrackerSmart') {
             return executeSmart(this, items, returnData, baseUrl, userId);
         }
         throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Unsupported resource: ${resource}`);
     }
 }
-exports.Parrot = Parrot;
-//# sourceMappingURL=Parrot.node.js.map
+exports.Polycracker = Polycracker;
+//# sourceMappingURL=Polycracker.node.js.map

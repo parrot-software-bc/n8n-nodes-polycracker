@@ -4,7 +4,7 @@ exports.TIER_CHAMELEON = exports.TIER_GUIDED = void 0;
 exports.asJsonObject = asJsonObject;
 exports.isRecord = isRecord;
 exports.normalizeApiBaseUrl = normalizeApiBaseUrl;
-exports.normalizeParrotGateUrlForIpv6 = normalizeParrotGateUrlForIpv6;
+exports.normalizeApiUrlForIpv6 = normalizeApiUrlForIpv6;
 exports.buildCleanMetadata = buildCleanMetadata;
 exports.buildCleanUserData = buildCleanUserData;
 exports.extractSmartPlusIntegrityMessage = extractSmartPlusIntegrityMessage;
@@ -19,7 +19,7 @@ const LEGACY_METADATA_KEYS = new Set([
     'userId',
     'action',
 ]);
-const PARROT_OUTPUT_STRIP_KEYS = [
+const OUTPUT_STRIP_KEYS = [
     'parrot_string',
     'parrot_session_id',
     'session_id',
@@ -42,7 +42,7 @@ function isRecord(value) {
 function normalizeApiBaseUrl(raw) {
     return String(raw !== null && raw !== void 0 ? raw : '').trim().replace(/\/$/, '');
 }
-function normalizeParrotGateUrlForIpv6(url) {
+function normalizeApiUrlForIpv6(url) {
     const trimmed = url.trim();
     const m = trimmed.match(/^(https?:\/\/)([^/]+)(.*)$/i);
     if (!m) {
@@ -74,7 +74,7 @@ function buildCleanMetadata(source) {
 }
 function buildCleanUserData(source) {
     const clean = { ...source };
-    for (const key of PARROT_OUTPUT_STRIP_KEYS) {
+    for (const key of OUTPUT_STRIP_KEYS) {
         delete clean[key];
     }
     return clean;
